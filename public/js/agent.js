@@ -15,6 +15,16 @@
   var busy = false;
 
   var STATUS_COLORS = { draft: 'gray', running: 'blue', done: 'green', failed: 'red', cancelled: 'amber' };
+  var notified = cfg.finished;
+
+  // Мост десктоп-приложения есть только внутри Electron.
+  if (window.desktop && window.desktop.isDesktop) {
+    var folderBtn = document.getElementById('open-workspace');
+    if (folderBtn) {
+      folderBtn.style.display = '';
+      folderBtn.addEventListener('click', function () { window.desktop.openWorkspace(); });
+    }
+  }
 
   function csrf() {
     return document.querySelector('meta[name="csrf-token"]').content;
@@ -144,6 +154,16 @@
       runBtn.disabled = true;
       hint.textContent = hint.textContent || cfg.i18n.done;
       busy = false;
+
+      if (!notified && (data.status === 'done' || data.status === 'failed')) {
+        notified = true;
+        if (window.desktop && window.desktop.isDesktop) {
+          window.desktop.notify(
+            data.status === 'done' ? 'Задача выполнена' : 'Задача завершилась с ошибкой',
+            document.title
+          );
+        }
+      }
     }
 
     return data;

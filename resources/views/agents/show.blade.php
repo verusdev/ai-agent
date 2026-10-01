@@ -97,7 +97,13 @@
             </div>
 
             <div class="card">
-                <div class="card-head"><h3>Артефакты</h3><span class="small muted" id="arts-count">{{ $agent->artifacts->count() }}</span></div>
+                <div class="card-head">
+                    <h3>Артефакты</h3>
+                    <div class="flex">
+                        <span class="small muted" id="arts-count">{{ $agent->artifacts->count() }}</span>
+                        <button class="btn btn-sm" id="open-workspace" style="display:none" title="Открыть папку с файлами задач">📂 Папка</button>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="arts" id="arts">
                         @foreach ($agent->artifacts as $artifact)

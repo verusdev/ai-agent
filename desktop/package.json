@@ -1,0 +1,72 @@
+{
+  "name": "ai-agent-desktop",
+  "productName": "AI Агент",
+  "version": "1.0.0",
+  "description": "Десктопное приложение ИИ-агента — локальный сервер Laravel в окне Electron",
+  "main": "main.js",
+  "license": "MIT",
+  "author": "verusdev",
+  "scripts": {
+    "start": "node start.js",
+    "dist": "electron-builder --win nsis portable --x64",
+    "dist:dir": "electron-builder --dir --win --x64"
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "ru.verusdev.aiagent",
+    "productName": "AI Агент",
+    "copyright": "Copyright (c) 2026",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "php-server.js",
+      "start.js",
+      "build/icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "app",
+        "filter": [
+          "app/**",
+          "bootstrap/**",
+          "config/**",
+          "database/**",
+          "public/**",
+          "resources/**",
+          "routes/**",
+          "storage/**",
+          "vendor/**",
+          "artisan",
+          "composer.json",
+          ".env",
+          ".env.example"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "AI-Agent-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AI Агент"
+    },
+    "portable": {
+      "artifactName": "AI-Agent-${version}-portable.${ext}"
+    }
+  }
+}

@@ -93,6 +93,8 @@ class PhpServer {
         cwd: this.root,
         windowsHide: true,
         env: { ...process.env, NO_COLOR: '1' },
+        // Отдельная группа процессов на POSIX — kill(-pid) гасит всё дерево.
+        detached: process.platform !== 'win32',
       }
     );
 
@@ -119,18 +121,26 @@ class PhpServer {
   stop() {
     if (!this.process) return;
 
+    const pid = this.process.pid;
+    this.process = null;
+
     try {
       // На Windows artisan serve порождает дочерние процессы — гасим дерево.
+      // Вызов синхронный: иначе приложение успевает завершиться, и taskkill
+      // не успевает ничего сделать, а сервер остаётся висеть на порту.
       if (process.platform === 'win32') {
-        spawn('taskkill', ['/pid', String(this.process.pid), '/T', '/F'], { windowsHide: true });
+        execFileSync('taskkill', ['/pid', String(pid), '/T', '/F'], {
+          windowsHide: true,
+          stdio: 'ignore',
+        });
       } else {
-        this.process.kill('SIGTERM');
+        process.kill(-pid, 'SIGTERM');
       }
+
+      console.log(`[php] сервер остановлен (pid ${pid})`);
     } catch (error) {
       console.error('[php] не удалось остановить сервер:', error.message);
     }
-
-    this.process = null;
   }
 
   collect(chunk) {
